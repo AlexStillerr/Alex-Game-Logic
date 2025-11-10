@@ -25,6 +25,7 @@ namespace AGL.MessageSystem
             SetupMessageBus();
 
             InitializeDependencies(true);
+            CallSetupDoneAction();
         }
 
         public void InitializeMessageBus()
@@ -32,7 +33,10 @@ namespace AGL.MessageSystem
             bool initialisationNeeded = SetupMessageBus(); 
 
             InitializeDependencies(initialisationNeeded);
+            CallSetupDoneAction();
         }
+
+        private void CallSetupDoneAction() => Bus.TriggerAction(new MessageSystemInitializedAction());
 
         private bool SetupMessageBus()
         {
