@@ -2,7 +2,6 @@
 
 namespace AGL.Player
 {
-    //[RequireComponent(typeof(Rigidbody2D))]
     public class PlayerController : MonoBehaviour
     {
         [SerializeField]
@@ -10,7 +9,7 @@ namespace AGL.Player
         [SerializeField]
         protected MovementStats stats;
 
-        protected MovementHandler movementHandler;
+        protected MovementHandlerBase movementHandler;
 
         void Start()
         {
@@ -21,7 +20,7 @@ namespace AGL.Player
         protected virtual void InitializeMovement()
         {
             Vector2 playerSize = new Vector2(1, 1);
-            movementHandler = new MovementHandler(new MoveWithKeyboard(), new MoveRangeCamera(playerSize));
+            movementHandler = new MovementHandlerTilemap(new MoveWithKeyboard(), new MoveRangeCamera(playerSize));
             movementHandler.SetupHandler(gameObject, stats);
         }
 

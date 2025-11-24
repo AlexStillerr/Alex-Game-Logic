@@ -16,55 +16,52 @@ namespace AGL.Player
         //Vector3 ClampToBorder(Vector3 origin);
     }
 
-    public class MovementHandler
+    public abstract class MovementHandlerBase
     {
-        private SpriteRenderer render;
-        private Transform target;
-        private Rigidbody2D rb;
-        private Vector2 movement;
+        protected Transform target;
+        protected Vector2 movement;
 
-        private MovementStats stats;
+        protected MovementStats stats;
 
-        IReceiveMoveInput input;
-        IHandleMoveRange moveRange;
+        protected IReceiveMoveInput input;
 
-        public MovementHandler(IReceiveMoveInput input, IHandleMoveRange moveRange)
+        public MovementHandlerBase(IReceiveMoveInput input)
         {
             this.input = input;
-            this.moveRange = moveRange;
         }
 
-        public void SetupHandler(GameObject player, MovementStats stats)
+        public virtual void SetupHandler(GameObject player, MovementStats stats)
         {
             this.stats = stats;
             target = player.transform;
-            render = player.GetComponentInChildren<SpriteRenderer>();
-            //rb = player.GetComponent<Rigidbody2D>();
-            //rb.gravityScale = 0;
         }
 
         public void UpdateMovement()
         {
             movement = input.GetMoveVector();
-            
-            if (stats.UseRotation && movement != Vector2.zero)
-            {
-                float angle = Mathf.Atan2(movement.y, movement.x) * Mathf.Rad2Deg;
-                render.transform.rotation = Quaternion.Euler(0, 0, angle);
-            }
         }
-        /*
-        public void Move()
+
+        public abstract void Move();
+    }
+
+    public class MovementHandlerTilemap : MovementHandlerBase
+    {
+        private SpriteRenderer render;
+
+        protected IHandleMoveRange moveRange;
+
+        public MovementHandlerTilemap(IReceiveMoveInput input, IHandleMoveRange moveRange) : base(input)
         {
-            if( moveRange.CanWalk(rb.position+ movement * stats.MoveSpeed))
-                rb.linearVelocity = movement * stats.MoveSpeed;
-            else
-                rb.position =  moveRange.ClampToBorder(rb.position);
-                
+            this.moveRange = moveRange;
         }
-        /*/ 
-        //Without Rigidbody
-        public void Move()
+
+        public override void SetupHandler(GameObject player, MovementStats stats)
+        {
+            base.SetupHandler(player, stats);
+            render = player.GetComponentInChildren<SpriteRenderer>();
+        }
+
+        public override void Move()
         {
             Vector3 pos = target.position;
             pos.x += (Time.deltaTime * stats.MoveSpeed * movement.x);
@@ -73,6 +70,5 @@ namespace AGL.Player
             if(moveRange.CanWalk(pos))
                 target.position = pos;
         }
-        //*/
     }
 }
